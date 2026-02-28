@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>S.P VAULT</title>
+    <style>
+        :root { --primary: #00f2ff; --bg: #0a0a0c; --card: #16161a; }
+        body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        
+        /* Lock Screen UI */
+        #lock-screen {
+            position: fixed; inset: 0; z-index: 100; background: var(--bg);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center;
+        }
+        .logo-big { font-size: 5rem; font-weight: 900; color: var(--primary); text-shadow: 0 0 20px rgba(0,242,255,0.5); }
+        .btn-auth { 
+            margin-top: 30px; background: var(--primary); color: black; border: none; 
+            padding: 18px 45px; border-radius: 40px; font-weight: bold; font-size: 1.1rem;
+            box-shadow: 0 0 15px var(--primary); cursor: pointer;
+        }
+
+        /* Dashboard UI */
+        #main-app { display: none; height: 100vh; display: flex; flex-direction: column; }
+        .header { padding: 30px; text-align: center; border-bottom: 1px solid #222; }
+        .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+        .nav-item { 
+            background: var(--card); padding: 30px 10px; border-radius: 20px; 
+            text-align: center; border: 1px solid #333; cursor: pointer;
+        }
+        .nav-item h3 { margin: 0; color: var(--primary); font-size: 1rem; }
+        
+        /* Section View */
+        .section-view { display: none; padding: 20px; position: fixed; inset: 0; background: var(--bg); z-index: 50; }
+        .active { display: block !important; }
+        .back-btn { color: var(--primary); background: none; border: none; font-size: 1rem; margin-bottom: 20px; cursor: pointer; }
+        
+        .list-item { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        input { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #444; background: #000; color: white; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="lock-screen">
+        <div class="logo-big">S.P</div>
+        <p style="letter-spacing: 3px; color: #666;">ENCRYPTED STORAGE</p>
+        <button class="btn-auth" onclick="unlock()">ACCESS VAULT</button>
+    </div>
+
+    <div id="main-app">
+        <div class="header"><div style="font-size: 1.5rem; font-weight: bold;">S.P DASHBOARD</div></div>
+        
+        <div class="nav-grid">
+            <div class="nav-item" onclick="showSec('sec-links')"><h3>LINKS</h3></div>
+            <div class="nav-item" onclick="showSec('sec-docs')"><h3>DOCS</h3></div>
+            <div class="nav-item" onclick="showSec('sec-photos')"><h3>PHOTOS</h3></div>
+            <div class="nav-item" onclick="showSec('sec-videos')"><h3>VIDEOS</h3></div>
+        </div>
+    </div>
+
+    <div id="sec-links" class="section-view">
+        <button class="back-btn" onclick="hideSec()">← BACK</button>
+        <h2>Private Links</h2>
+        <input type="text" id="linkInput" placeholder="Enter URL...">
+        <button class="btn-auth" style="width:100%" onclick="saveLink()">SAVE LINK</button>
+        <div id="linkList" style="margin-top:20px"></div>
+    </div>
+
+    <script>
+        // UNLOCK FUNCTION
+        function unlock() {
+            // This simulates the fingerprint check
+            document.getElementById('lock-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            loadLinks();
+        }
+
+        // NAVIGATION
+        function showSec(id) { document.getElementById(id).classList.add('active'); }
+        function hideSec() { document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active')); }
+
+        // SIMPLE STORAGE LOGIC
+        function saveLink() {
+            const val = document.getElementById('linkInput').value;
+            if(!val) return;
+            let links = JSON.parse(localStorage.getItem('sp_links') || '[]');
+            links.push(val);
+            localStorage.setItem('sp_links', JSON.stringify(links));
+            document.getElementById('linkInput').value = '';
+            loadLinks();
+        }
+
+        function loadLinks() {
+            const list = document.getElementById('linkList');
+            let links = JSON.parse(localStorage.getItem('sp_links') || '[]');
+            list.innerHTML = links.map(l => `<div class="list-item">${l}</div>`).join('');
+        }
+    </script>
+</body>
+</html>
